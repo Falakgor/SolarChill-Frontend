@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>SolarChill | Smart Cold Storage</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="logo-section">
+
+            <div class="logo">
+                ☀️
+            </div>
+
+            <div>
+                <h1>SolarChill</h1>
+
+                <p>
+                    Smart Solar Cold Storage
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="connection-status">
+
+            <span class="status-dot"></span>
+
+            <span>
+                System Connected
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="dashboard">
+
+
+        <!-- =====================================
+             PAGE TITLE
+        ====================================== -->
+
+        <section class="dashboard-heading">
+
+            <div>
+
+                <h2>
+                    Cold Storage Monitoring
+                </h2>
+
+                <p>
+                    Real-time environmental monitoring
+                    and automated cooling control
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             SENSOR CARDS
+        ====================================== -->
+
+        <section class="cards">
+
+
+            <!-- TEMPERATURE -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        Temperature
+                    </span>
+
+                    <span class="card-icon">
+                        🌡️
+                    </span>
+
+                </div>
+
+
+                <div class="card-value">
+
+                    <span id="temperature">
+                        --.- 
+                    </span>
+
+                    <span class="unit">
+                        °C
+                    </span>
+
+                </div>
+
+
+                <p class="card-description">
+                    Current storage temperature
+                </p>
+
+            </div>
+
+
+
+            <!-- FAN SPEED -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        Fan Speed
+                    </span>
+
+                    <span class="card-icon">
+                        🌀
+                    </span>
+
+                </div>
+
+
+                <div class="card-value">
+
+                    <span id="fanSpeed">
+                        -- 
+                    </span>
+
+                    <span class="unit">
+                        %
+                    </span>
+
+                </div>
+
+
+                <p class="card-description">
+                    Automatic cooling power
+                </p>
+
+            </div>
+
+
+
+            <!-- SYSTEM STATUS -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        System Status
+                    </span>
+
+                    <span class="card-icon">
+                        ⚡
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="systemStatus"
+                    class="status-value"
+                >
+                    --
+                </div>
+
+
+                <p class="card-description">
+                    Current storage condition
+                </p>
+
+            </div>
+
+
+
+            <!-- LAST UPDATED -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        Last Updated
+                    </span>
+
+                    <span class="card-icon">
+                        🕐
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="lastUpdated"
+                    class="time-value"
+                >
+                    --
+                </div>
+
+
+                <p class="card-description">
+                    Latest sensor reading
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             TEMPERATURE GRAPH
+        ====================================== -->
+
+        <section class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+
+                    <h3>
+                        Temperature History
+                    </h3>
+
+                    <p>
+                        Storage temperature over time
+                    </p>
+
+                </div>
+
+
+                <div class="chart-info">
+
+                    Last 100 readings
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas
+                    id="temperatureChart"
+                ></canvas>
+
+            </div>
+
+        </section>
+
+<!-- =====================================
+     LAST 5 READINGS
+====================================== -->
+
+<section class="readings-card">
+
+    <div class="readings-header">
+
+        <div>
+            <h3>Recent Readings</h3>
+
+            <p>
+                Last 5 sensor readings
+            </p>
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Time</th>
+                    <th>Temperature</th>
+                    <th>Fan Speed</th>
+                    <th>Condition</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="readingsTable">
+
+                <tr>
+                    <td colspan="4">
+                        Loading...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+        <!-- =====================================
+             SYSTEM INFORMATION
+        ====================================== -->
+
+        <section class="info-section">
+
+
+            <div class="info-card">
+
+                <h3>
+                    Cooling Logic
+                </h3>
+
+                <div class="logic-row">
+
+                    <span>
+                        Below 18.5°C
+                    </span>
+
+                    <strong>
+                        Fan OFF
+                    </strong>
+
+                </div>
+
+
+                <div class="logic-row">
+
+                    <span>
+                        18.5°C – 21.9°C
+                    </span>
+
+                    <strong>
+                        Fan 40%
+                    </strong>
+
+                </div>
+
+
+                <div class="logic-row">
+
+                    <span>
+                        22°C – 25.9°C
+                    </span>
+
+                    <strong>
+                        Fan 70%
+                    </strong>
+
+                </div>
+
+
+                <div class="logic-row">
+
+                    <span>
+                        ≥ 26°C
+                    </span>
+
+                    <strong>
+                        Fan 100%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="info-card">
+
+                <h3>
+                    System Architecture
+                </h3>
+
+                <div class="architecture">
+
+                    <span>
+                        DS18B20
+                    </span>
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                    <span>
+                        NodeMCU
+                    </span>
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                    <span>
+                        Render API
+                    </span>
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                    <span>
+                        MongoDB
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="footer">
+
+        <p>
+            SolarChill — Smart Solar Cold Storage
+        </p>
+
+        <p>
+            SIH 2026 Prototype
+        </p>
+
+    </footer>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
