@@ -707,3 +707,220 @@ tbody tr:hover {
 
     color: #6b7280;
 }
+
+/* ==================================================
+   ALERT CARD
+================================================== */
+
+.alert-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 20px 24px;
+
+    border-radius: 16px;
+
+    margin-bottom: 25px;
+
+    border: 1px solid;
+
+    transition:
+        background 0.3s ease,
+        border-color 0.3s ease;
+
+}
+
+
+/* Alert Icon */
+
+.alert-icon {
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    flex-shrink: 0;
+
+}
+
+
+/* Alert Content */
+
+.alert-content h3 {
+
+    font-size: 17px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.alert-content p {
+
+    font-size: 13px;
+
+    margin: 0;
+
+}
+
+
+/* NORMAL */
+
+.alert-card.normal {
+
+    background: #f0fdf4;
+
+    border-color: #bbf7d0;
+
+}
+
+.alert-card.normal .alert-icon {
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+}
+
+.alert-card.normal h3 {
+
+    color: #15803d;
+
+}
+
+.alert-card.normal p {
+
+    color: #166534;
+
+}
+
+
+/* WARNING */
+
+.alert-card.warning {
+
+    background: #fffbeb;
+
+    border-color: #fde68a;
+
+}
+
+.alert-card.warning .alert-icon {
+
+    background: #fef3c7;
+
+    color: #d97706;
+
+}
+
+.alert-card.warning h3 {
+
+    color: #b45309;
+
+}
+
+.alert-card.warning p {
+
+    color: #92400e;
+
+}
+
+
+/* CRITICAL */
+
+.alert-card.critical {
+
+    background: #fef2f2;
+
+    border-color: #fecaca;
+
+}
+
+.alert-card.critical .alert-icon {
+
+    background: #fee2e2;
+
+    color: #dc2626;
+
+}
+
+.alert-card.critical h3 {
+
+    color: #dc2626;
+
+}
+
+.alert-card.critical p {
+
+    color: #991b1b;
+
+}
+
+
+/* OFFLINE */
+
+.alert-card.offline {
+
+    background: #f9fafb;
+
+    border-color: #e5e7eb;
+
+}
+
+.alert-card.offline .alert-icon {
+
+    background: #f3f4f6;
+
+    color: #6b7280;
+
+}
+
+.alert-card.offline h3 {
+
+    color: #6b7280;
+
+}
+
+.alert-card.offline p {
+
+    color: #6b7280;
+
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .alert-card {
+
+        padding: 18px;
+
+    }
+
+    .alert-icon {
+
+        width: 40px;
+
+        height: 40px;
+
+        font-size: 19px;
+
+    }
+
+}
