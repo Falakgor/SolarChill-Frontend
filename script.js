@@ -35,10 +35,270 @@ const readingsTable =
 
 
 // --------------------------------------------------
+// ALERT ELEMENTS
+// --------------------------------------------------
+
+const alertCard =
+    document.getElementById("alertCard");
+
+const alertIcon =
+    document.getElementById("alertIcon");
+
+const alertTitle =
+    document.getElementById("alertTitle");
+
+const alertMessage =
+    document.getElementById("alertMessage");
+
+
+// --------------------------------------------------
+// ALERT STATE
+// --------------------------------------------------
+
+// Used to prevent notification spam
+
+let previousAlertStatus = null;
+
+let firstAlertLoad = true;
+
+
+// --------------------------------------------------
 // CHART
 // --------------------------------------------------
 
 let temperatureChart = null;
+
+
+// ==================================================
+// BROWSER NOTIFICATION PERMISSION
+// ==================================================
+
+function requestNotificationPermission() {
+
+    if (!("Notification" in window)) {
+
+        console.log(
+            "Browser notifications are not supported."
+        );
+
+        return;
+
+    }
+
+
+    if (Notification.permission === "default") {
+
+        Notification.requestPermission()
+            .then(permission => {
+
+                console.log(
+                    "Notification permission:",
+                    permission
+                );
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Notification permission error:",
+                    error
+                );
+
+            });
+
+    }
+
+}
+
+
+// ==================================================
+// SHOW BROWSER NOTIFICATION
+// ==================================================
+
+function showBrowserNotification(
+    alertStatus,
+    temperature,
+    message
+) {
+
+    if (!("Notification" in window)) {
+
+        return;
+
+    }
+
+
+    if (Notification.permission !== "granted") {
+
+        return;
+
+    }
+
+
+    let title;
+
+
+    if (alertStatus === "CRITICAL") {
+
+        title =
+            "🚨 SolarChill Critical Alert";
+
+    }
+
+    else if (alertStatus === "WARNING") {
+
+        title =
+            "⚠️ SolarChill Warning";
+
+    }
+
+    else {
+
+        title =
+            "✅ SolarChill Alert Cleared";
+
+    }
+
+
+    new Notification(
+        title,
+        {
+
+            body:
+                `Temperature: ${temperature.toFixed(1)}°C\n${message}`,
+
+            icon:
+                "https://cdn-icons-png.flaticon.com/512/1163/1163661.png"
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// UPDATE ALERT CARD
+// ==================================================
+
+function updateAlert(
+    alertStatus,
+    temperature,
+    message
+) {
+
+    alertStatus =
+        String(alertStatus || "Normal").toUpperCase();
+
+
+    // ------------------------------------------
+    // NORMAL
+    // ------------------------------------------
+
+    if (alertStatus === "NORMAL") {
+
+        alertCard.className =
+            "alert-card normal";
+
+        alertIcon.textContent =
+            "✓";
+
+        alertTitle.textContent =
+            "System Normal";
+
+        alertMessage.textContent =
+            message ||
+            "Temperature is within the safe range.";
+
+    }
+
+
+    // ------------------------------------------
+    // WARNING
+    // ------------------------------------------
+
+    else if (alertStatus === "WARNING") {
+
+        alertCard.className =
+            "alert-card warning";
+
+        alertIcon.textContent =
+            "⚠";
+
+        alertTitle.textContent =
+            "Warning";
+
+        alertMessage.textContent =
+            message ||
+            "Temperature is above the normal range.";
+
+    }
+
+
+    // ------------------------------------------
+    // CRITICAL
+    // ------------------------------------------
+
+    else if (alertStatus === "CRITICAL") {
+
+        alertCard.className =
+            "alert-card critical";
+
+        alertIcon.textContent =
+            "🚨";
+
+        alertTitle.textContent =
+            "Critical Alert";
+
+        alertMessage.textContent =
+            message ||
+            "Critical temperature detected! Immediate attention required.";
+
+    }
+
+
+    // ------------------------------------------
+    // OFFLINE
+    // ------------------------------------------
+
+    else {
+
+        alertCard.className =
+            "alert-card offline";
+
+        alertIcon.textContent =
+            "!";
+
+        alertTitle.textContent =
+            "System Offline";
+
+        alertMessage.textContent =
+            "Unable to receive sensor data.";
+
+    }
+
+
+    // ------------------------------------------
+    // Browser Notification
+    // ------------------------------------------
+
+    if (!firstAlertLoad &&
+        alertStatus !== previousAlertStatus) {
+
+        showBrowserNotification(
+            alertStatus,
+            temperature,
+            message
+        );
+
+    }
+
+
+    previousAlertStatus =
+        alertStatus;
+
+    firstAlertLoad = false;
+
+}
 
 
 // ==================================================
@@ -52,6 +312,7 @@ async function fetchLatestData() {
         const response =
             await fetch(LATEST_API);
 
+
         if (!response.ok) {
 
             throw new Error(
@@ -59,6 +320,7 @@ async function fetchLatestData() {
             );
 
         }
+
 
         const data =
             await response.json();
@@ -71,6 +333,7 @@ async function fetchLatestData() {
         const temperature =
             Number(data.temperature);
 
+
         temperatureElement.textContent =
             temperature.toFixed(1);
 
@@ -81,17 +344,21 @@ async function fetchLatestData() {
 
         let fanSpeed;
 
+
         if (data.fanSpeed !== undefined) {
 
             fanSpeed =
                 Number(data.fanSpeed);
 
-        } else {
+        }
+
+        else {
 
             fanSpeed =
                 calculateFanSpeed(temperature);
 
         }
+
 
         fanSpeedElement.textContent =
             fanSpeed;
@@ -103,17 +370,21 @@ async function fetchLatestData() {
 
         let status;
 
+
         if (data.status !== undefined) {
 
             status =
                 String(data.status).toUpperCase();
 
-        } else {
+        }
+
+        else {
 
             status =
                 calculateStatus(temperature);
 
         }
+
 
         systemStatusElement.textContent =
             status;
@@ -127,6 +398,28 @@ async function fetchLatestData() {
 
 
         // ------------------------------------------
+        // ALERT
+        // ------------------------------------------
+
+        const alertStatus =
+            data.alertStatus !== undefined
+                ? String(data.alertStatus).toUpperCase()
+                : calculateStatus(temperature);
+
+
+        const alertMessage =
+            data.alertMessage ||
+            getDefaultAlertMessage(alertStatus);
+
+
+        updateAlert(
+            alertStatus,
+            temperature,
+            alertMessage
+        );
+
+
+        // ------------------------------------------
         // Last updated
         // ------------------------------------------
 
@@ -137,8 +430,8 @@ async function fetchLatestData() {
 
         }
 
-
     }
+
 
     catch (error) {
 
@@ -147,20 +440,78 @@ async function fetchLatestData() {
             error
         );
 
+
         temperatureElement.textContent =
             "--.-";
+
 
         fanSpeedElement.textContent =
             "--";
 
+
         systemStatusElement.textContent =
             "OFFLINE";
+
 
         lastUpdatedElement.textContent =
             "--";
 
-        updateStatusAppearance("OFFLINE");
+
+        updateStatusAppearance(
+            "OFFLINE"
+        );
+
+
+        updateOfflineAlert();
+
     }
+
+}
+
+
+// ==================================================
+// OFFLINE ALERT
+// ==================================================
+
+function updateOfflineAlert() {
+
+    alertCard.className =
+        "alert-card offline";
+
+    alertIcon.textContent =
+        "!";
+
+    alertTitle.textContent =
+        "System Offline";
+
+    alertMessage.textContent =
+        "Unable to receive sensor data.";
+
+}
+
+
+// ==================================================
+// DEFAULT ALERT MESSAGE
+// ==================================================
+
+function getDefaultAlertMessage(status) {
+
+    if (status === "WARNING") {
+
+        return "Temperature is above the normal range.";
+
+    }
+
+
+    if (status === "CRITICAL") {
+
+        return "Critical temperature detected! Immediate attention required.";
+
+    }
+
+
+    return "Temperature is within the safe range.";
+
 }
 
 
@@ -175,6 +526,7 @@ async function fetchHistoryData() {
         const response =
             await fetch(HISTORY_API);
 
+
         if (!response.ok) {
 
             throw new Error(
@@ -182,6 +534,7 @@ async function fetchHistoryData() {
             );
 
         }
+
 
         const data =
             await response.json();
@@ -198,6 +551,7 @@ async function fetchHistoryData() {
 
     }
 
+
     catch (error) {
 
         console.error(
@@ -206,6 +560,7 @@ async function fetchHistoryData() {
         );
 
     }
+
 }
 
 
@@ -225,7 +580,7 @@ function calculateStatus(temperature) {
 
     }
 
-    else if (temperature < 26) {
+    else if (temperature <= 26) {
 
         return "WARNING";
 
@@ -236,6 +591,7 @@ function calculateStatus(temperature) {
         return "CRITICAL";
 
     }
+
 }
 
 
@@ -272,6 +628,7 @@ function calculateFanSpeed(temperature) {
         return 100;
 
     }
+
 }
 
 
@@ -312,6 +669,7 @@ function updateStatusAppearance(status) {
             "#6b7280";
 
     }
+
 }
 
 
@@ -336,6 +694,7 @@ function formatDate(timestamp) {
             second: "2-digit"
         }
     );
+
 }
 
 
@@ -357,6 +716,7 @@ function formatTime(timestamp) {
             second: "2-digit"
         }
     );
+
 }
 
 
@@ -369,6 +729,7 @@ function updateTemperatureChart(data) {
     if (!Array.isArray(data)) {
 
         return;
+
     }
 
 
@@ -507,7 +868,9 @@ function updateTemperatureChart(data) {
                 }
 
             }
+
         );
+
 }
 
 
@@ -520,10 +883,9 @@ function updateRecentReadings(data) {
     if (!Array.isArray(data)) {
 
         return;
+
     }
 
-
-    // MongoDB data is newest first
 
     const lastFive =
         data.slice(0, 5);
@@ -544,6 +906,7 @@ function updateRecentReadings(data) {
         `;
 
         return;
+
     }
 
 
@@ -556,8 +919,6 @@ function updateRecentReadings(data) {
             Number(item.temperature);
 
 
-        // Use backend values if available
-
         const fanSpeed =
             item.fanSpeed !== undefined
                 ? Number(item.fanSpeed)
@@ -565,8 +926,8 @@ function updateRecentReadings(data) {
 
 
         const status =
-            item.status !== undefined
-                ? String(item.status).toUpperCase()
+            item.alertStatus !== undefined
+                ? String(item.alertStatus).toUpperCase()
                 : calculateStatus(temperature);
 
 
@@ -600,6 +961,7 @@ function updateRecentReadings(data) {
         readingsTable.appendChild(row);
 
     });
+
 }
 
 
@@ -619,6 +981,8 @@ async function loadDashboard() {
 // ==================================================
 // INITIAL LOAD
 // ==================================================
+
+requestNotificationPermission();
 
 loadDashboard();
 
